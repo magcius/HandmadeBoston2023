@@ -26,25 +26,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
       - name: Install pnpm
         uses: pnpm/action-setup@v2
-      - name: Checkout
-        uses: actions/checkout@v3
+        with:
+          version: 7
+          run_install: |
+            - cwd: viz1
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      - name: Install
-        run: pnpm install
-        working-directory: viz1
       - name: Build Parcel
-        run: pnpm parcel build viz1.html
+        run: pnpm parcel build --public-url=. viz1.html
         working-directory: viz1
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
-        path: viz1/dist/
+        with:
+          path: viz1/dist/
 
   # Deployment job
   deploy:
