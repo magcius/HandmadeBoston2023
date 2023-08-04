@@ -87,7 +87,7 @@ class Canvas {
     }
 
     private circle2d(x: number, y: number, radius: number): void {
-        this.ctx.arc(x, y, this.getSize(radius), 0.0, Math.PI * 2);
+        this.ctx.arc(x, y, radius, 0.0, Math.PI * 2);
     }
 
     public drawPoint(canvasPosition: ReadonlyVec2, color = 'black', size = 8): void {
@@ -102,7 +102,7 @@ class Canvas {
     public drawCircle(canvasPosition: ReadonlyVec2, radius: number, color = 'black', size = 8): void {
         // Draw a circle centered at canvasPosition, with a radius of size / 2.
         this.ctx.beginPath();
-        this.circle2d(canvasPosition[0], canvasPosition[1], this.getSize(radius / 2));
+        this.circle2d(canvasPosition[0], canvasPosition[1], radius / 2);
         this.ctx.closePath();
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = this.getSize(size);
@@ -697,23 +697,23 @@ class Viz {
         }
 
         if (this.state.demo === Demo.DotProduct || this.state.demo === Demo.DotProductNormal || this.state.demo === Demo.PointLight) {
-            const canvasPosition = this.transformWorld2DToCanvas(vec2.fromValues(0.0, -0.75));
+            const canvasPosition = this.transformWorld2DToCanvas(vec2.fromValues(0.0, -0.65));
 
             const ctx = this.canvas.ctx;
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.fillRect(0, canvasPosition[1] - 50, this.canvas.width, this.canvas.height);
+            ctx.fillRect(0, canvasPosition[1] - this.canvas.getSize(50), this.canvas.width, this.canvas.height);
 
             ctx.fillStyle = '#333';
             ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
             ctx.textAlign = 'center';
 
             ctx.fillText(`Total number of possible light rays: ${lightRayNum}`, canvasPosition[0], canvasPosition[1]);
-            canvasPosition[1] += 40;
+            canvasPosition[1] += this.canvas.getSize(40);
             ctx.fillText(`Number of light rays hitting the surface: ${lightRayHitNum}`, canvasPosition[0], canvasPosition[1]);
-            canvasPosition[1] += 40;
+            canvasPosition[1] += this.canvas.getSize(40);
             const ratio = lightRayHitNum / (lightRayNum);
             ctx.fillText(`Ratio: ${lightRayHitNum} / ${lightRayNum} = ${ratio.toFixed(4)}`, canvasPosition[0], canvasPosition[1]);
-            canvasPosition[1] += 40;
+            canvasPosition[1] += this.canvas.getSize(40);
             const cos = Math.abs(vec2.dot(this.state.surfaceNormal, lightDir));
             ctx.fillText(`Angle: ${(Math.acos(cos) * 180 / Math.PI).toFixed(0)}°  Cos: ${cos.toFixed(4)}`, canvasPosition[0], canvasPosition[1]);
         } else if (this.state.demo === Demo.PointLightPixel) {
@@ -721,13 +721,13 @@ class Viz {
 
             const ctx = this.canvas.ctx;
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.fillRect(0, canvasPosition[1] - 50, this.canvas.width, this.canvas.height);
+            ctx.fillRect(0, canvasPosition[1] - this.canvas.getSize(50), this.canvas.width, this.canvas.height);
 
             ctx.fillStyle = '#333';
             ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
             ctx.textAlign = 'center';
 
-            canvasPosition[1] += 40 * 2;
+            canvasPosition[1] += this.canvas.getSize(40) * 2;
             const cos = -vec2.dot(lightDir, this.state.surfaceNormal);
             ctx.fillText(`Angle: ${(Math.acos(cos) * 180 / Math.PI).toFixed(0)}°  Cos: ${cos.toFixed(4)}`, canvasPosition[0], canvasPosition[1]);
         }
@@ -873,20 +873,20 @@ class Viz {
             this.state.frustumCubeLerp = slider({ x: 0.0, y: -0.94, min: 0.0, max: 1.0, value: this.state.frustumCubeLerp, label: 'Perspective Divide' });
 
             if (this.state.demo === Demo.CameraFrustumProjectionMatrix) {
-                const mx = this.canvas.width - 500, my = 100;
+                const mx = this.canvas.width - this.canvas.getSize(500), my = this.canvas.getSize(100);
                 const ctx = this.canvas.ctx;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.strokeStyle = '#333333CC';
                 ctx.lineWidth = this.canvas.getSize(4);
-                ctx.fillRect(mx, my, 450, 240);
-                ctx.strokeRect(mx, my, 450, 240);
+                ctx.fillRect(mx, my, this.canvas.getSize(450), this.canvas.getSize(240));
+                ctx.strokeRect(mx, my, this.canvas.getSize(450), this.canvas.getSize(240));
 
                 ctx.save();
                 ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
 
                 ctx.fillStyle = '#333';
                 ctx.textAlign = 'left';
-                ctx.fillText('Projection Matrix', mx, my - 20);
+                ctx.fillText('Projection Matrix', mx, my - this.canvas.getSize(20));
 
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
@@ -894,8 +894,8 @@ class Viz {
                     for (let y = 0; y < 4; y++) {
                         const n = m[y*4 + x];
                         ctx.fillStyle = n !== 0 ? '#333' : '#aaa';
-                        const tx = mx + x * 100 + 110;
-                        const ty = my + y * 50 + 65;
+                        const tx = mx + x * this.canvas.getSize(100) + this.canvas.getSize(110);
+                        const ty = my + y * this.canvas.getSize(50) + this.canvas.getSize(65);
                         ctx.fillText(n.toFixed(2), tx, ty);
                     }
                 }
