@@ -32,6 +32,11 @@ class Canvas {
         this.onResize();
     }
 
+    public getSize(size: number): number {
+        // sizes were authored assuming a devicePixelRatio of 2
+        return size * window.devicePixelRatio / 2;
+    }
+
     private onResize(): void {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -82,13 +87,13 @@ class Canvas {
     }
 
     private circle2d(x: number, y: number, radius: number): void {
-        this.ctx.arc(x, y, radius, 0.0, Math.PI * 2);
+        this.ctx.arc(x, y, this.getSize(radius), 0.0, Math.PI * 2);
     }
 
     public drawPoint(canvasPosition: ReadonlyVec2, color = 'black', size = 8): void {
         // Draw a circle centered at canvasPosition, with a radius of size / 2.
         this.ctx.beginPath();
-        this.circle2d(canvasPosition[0], canvasPosition[1], size / 2);
+        this.circle2d(canvasPosition[0], canvasPosition[1], this.getSize(size / 2));
         this.ctx.closePath();
         this.ctx.fillStyle = color;
         this.ctx.fill();
@@ -97,10 +102,10 @@ class Canvas {
     public drawCircle(canvasPosition: ReadonlyVec2, radius: number, color = 'black', size = 8): void {
         // Draw a circle centered at canvasPosition, with a radius of size / 2.
         this.ctx.beginPath();
-        this.circle2d(canvasPosition[0], canvasPosition[1], radius / 2);
+        this.circle2d(canvasPosition[0], canvasPosition[1], this.getSize(radius / 2));
         this.ctx.closePath();
         this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = size;
+        this.ctx.lineWidth = this.getSize(size);
         this.ctx.stroke();
     }
 
@@ -109,7 +114,7 @@ class Canvas {
         this.ctx.moveTo(canvasPositionA[0], canvasPositionA[1]);
         this.ctx.lineTo(canvasPositionB[0], canvasPositionB[1]);
         this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = this.getSize(lineWidth);
         this.ctx.stroke();
     }
 
@@ -118,7 +123,7 @@ class Canvas {
         this.ctx.moveTo(canvasPositionA[0], canvasPositionA[1]);
         this.ctx.lineTo(canvasPositionB[0], canvasPositionB[1]);
         this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = this.getSize(lineWidth);
         this.ctx.stroke();
 
         // Draw the little arrows at canvasPositionB.
@@ -126,7 +131,7 @@ class Canvas {
         const dir = vec2.sub(vec2.create(), canvasPositionB, canvasPositionA);
         vec2.normalize(dir, dir);
         this.ctx.moveTo(canvasPositionB[0], canvasPositionB[1]);
-        const arrowSize = lineWidth * 2.0;
+        const arrowSize = this.getSize(lineWidth) * 2.0;
         const arrowP1X = -dir[1] * arrowSize, arrowP1Y =  dir[0] * arrowSize;
         const arrowP2X =  dir[1] * arrowSize, arrowP2Y = -dir[0] * arrowSize;
         const arrowP3X =  dir[0] * 20, arrowP3Y =  dir[1] * 20;
@@ -678,7 +683,7 @@ class Viz {
             // ctx.fillRect(canvasPosition[0] - textWidth * 0.5, canvasPosition[1] - textHeight * 0.5, textWidth, textHeight);
 
             ctx.fillStyle = '#333';
-            ctx.font = '24pt sans-serif';
+            ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
@@ -699,7 +704,7 @@ class Viz {
             ctx.fillRect(0, canvasPosition[1] - 50, this.canvas.width, this.canvas.height);
 
             ctx.fillStyle = '#333';
-            ctx.font = '24pt sans-serif';
+            ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
             ctx.textAlign = 'center';
 
             ctx.fillText(`Total number of possible light rays: ${lightRayNum}`, canvasPosition[0], canvasPosition[1]);
@@ -719,7 +724,7 @@ class Viz {
             ctx.fillRect(0, canvasPosition[1] - 50, this.canvas.width, this.canvas.height);
 
             ctx.fillStyle = '#333';
-            ctx.font = '24pt sans-serif';
+            ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
             ctx.textAlign = 'center';
 
             canvasPosition[1] += 40 * 2;
@@ -840,7 +845,7 @@ class Viz {
                 this.canvas.drawPoint(handlePos, handleColor, handleSize);
 
                 ctx.save();
-                ctx.font = '24pt sans-serif';
+                ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
 
                 if (drawValue) {
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
@@ -872,12 +877,12 @@ class Viz {
                 const ctx = this.canvas.ctx;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.strokeStyle = '#333333CC';
-                ctx.lineWidth = 4;
+                ctx.lineWidth = this.canvas.getSize(4);
                 ctx.fillRect(mx, my, 450, 240);
                 ctx.strokeRect(mx, my, 450, 240);
 
                 ctx.save();
-                ctx.font = '24pt sans-serif';
+                ctx.font = `${this.canvas.getSize(24)}pt sans-serif`;
 
                 ctx.fillStyle = '#333';
                 ctx.textAlign = 'left';
